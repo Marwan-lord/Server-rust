@@ -7,13 +7,13 @@ use std::{
 };
 
 pub struct ThreadPool {
-    workers: Vec<Worker>,
+    _workers: Vec<Worker>,
     sender: mpsc::Sender<Job>,
 }
 
 struct Worker {
-    id: usize,
-    thread: thread::JoinHandle<()>,
+    _id: usize,
+    _thread: thread::JoinHandle<()>,
 }
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
@@ -25,7 +25,7 @@ impl Worker {
             println!("Worker: {} Got a Job", id);
             job();
         });
-        Worker { id, thread }
+        Worker { _id: id, _thread: thread}
     }
 }
 
@@ -38,8 +38,9 @@ impl ThreadPool {
         for id in 0..size {
             workers.push(Worker::new(id, Arc::clone(&receiver)))
         }
-        ThreadPool { workers, sender }
+        ThreadPool { _workers: workers, sender }
     }
+
     pub fn execute<F>(&self, f: F)
     where
         F: FnOnce() + 'static + Send,
