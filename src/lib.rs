@@ -25,20 +25,23 @@ impl Worker {
             println!("Worker: {} Got a Job", id);
             job();
         });
-        Worker { _id: id, _thread: thread}
+        Worker { _id: id, _thread: thread }
     }
 }
 
 impl ThreadPool {
     pub fn new(size: usize) -> ThreadPool {
         assert!(size > 0);
-        let (sender, receiver) = channel();
-        let receiver = Arc::new(Mutex::new(receiver));
+        let (tx, rx) = channel();
+        let receiver = Arc::new(Mutex::new(rx));
         let mut workers = Vec::with_capacity(size);
         for id in 0..size {
-            workers.push(Worker::new(id, Arc::clone(&receiver)))
+            workers.push(Worker::new(id, Arc::clone(&receiver))) ;
         }
-        ThreadPool { _workers: workers, sender }
+        ThreadPool {
+            _workers: workers,
+            sender: tx,
+        }
     }
 
     pub fn execute<F>(&self, f: F)
